@@ -3,10 +3,12 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <errno.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
     char *host = argv[1];
     char *filepath = argv[2];
+    char *port = argv[3];
 
     printf("Server : %s\nFilepath : %s\n", host, filepath);
     
@@ -18,7 +20,7 @@ int main(int argc, char *argv[]) {
 
     // Getting the adresses
     struct addrinfo *res;
-    if (getaddrinfo(host, NULL, &hints, &res)==-1){
+    if (getaddrinfo(host, port, &hints, &res)==-1){
         perror(gai_strerror(errno));
         exit(EXIT_FAILURE);
     }
@@ -51,6 +53,32 @@ int main(int argc, char *argv[]) {
 
     printf("Connected to server...\n");
 
+    // Creating the request packet
 
+    char request[512];
+
+    request[0] = 0;
+    request[1] = 1; 
+
+    for (int i = 0; i < strlen(filepath); i++) {
+        request[2+i] = filepath[i];
+    }
+    request[strlen(filepath) + 2] = 0;
+
+    char mode[5] = "octet";
+    
+    for (int i = 0; i < strlen(mode); i++) {
+        request[strlen(filepath) + 3 + i] = mode[i];
+    }
+    request[strlen(filepath) + 3 + strlen(mode)] = 0;
+    
+    // Sending the request packet
+    
+    int request_length = strlen(filepath) + 3 + strlen(mode) + 1;
+    if (sendto(sock, request, request_length, 0, res->ai_addr, res->ai_addrlen) == -1) {
+        perror("sendto");
+        exit(EXIT_FAILURE);
+    }
+    // if (recvfrom(sock, request, strlen(request), 
 
 }
