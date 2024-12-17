@@ -5,6 +5,19 @@
 #include <errno.h>
 #include <string.h>
 
+// Reminder of the addrinfo structure 
+
+// struct addrinfo {
+//     int ai_flags;
+//     int ai_family;
+//     int ai_socktype;
+//     int ai_protocol;
+//     socklen_t ai_addrlen;
+//     struct sockaddr *ai_addr;
+//     char *ai_canonname;
+//     struct addrinfo *ai_next;
+// };
+
 int main(int argc, char *argv[]) {
     char *host = argv[1];
     char *filepath = argv[2];
@@ -33,25 +46,25 @@ int main(int argc, char *argv[]) {
 
     // Getting the IP address from the adress
     char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
-    if (getnameinfo(res->ai_addr, res->ai_addrlen, hbuf, sizeof(hbuf), sbuf,sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV) == 0){
-        printf("IP adress : %s\n", hbuf);
+    if (getnameinfo(res->ai_addr, res->ai_addrlen, hbuf, sizeof(hbuf), sbuf,sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV) == -1){
+        printf("IP address : %s\n", hbuf);
     }
 
 
     // Creating a socket
     int sock;
-    if ((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
+    if ((sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1) {
         perror("socket");
         exit(EXIT_FAILURE);
     }
 
-    // Connecting to the server
-    if (connect(sock, res->ai_addr, res->ai_addrlen) == -1) {
-        perror("connect");
-        exit(EXIT_FAILURE);
-    }
+    // // Connecting to the server
+    // if (connect(sock, res->ai_addr, res->ai_addrlen) == -1) {
+    //     perror("connect");
+    //     exit(EXIT_FAILURE);
+    // }
 
-    printf("Connected to server...\n");
+    // printf("Connected to server...\n");
 
     // Creating the request packet
 
@@ -65,7 +78,10 @@ int main(int argc, char *argv[]) {
     }
     request[strlen(filepath) + 2] = 0;
 
-    char mode[5] = "octet";
+    char mode[10] = "octet";
+
+    // printf("%d \n\r", strlen(filepath));
+    // printf("%d \n\r", strlen(mode));
     
     for (int i = 0; i < strlen(mode); i++) {
         request[strlen(filepath) + 3 + i] = mode[i];
@@ -74,11 +90,51 @@ int main(int argc, char *argv[]) {
     
     // Sending the request packet
     
-    int request_length = strlen(filepath) + 3 + strlen(mode) + 1;
+    int request_length = strlen(filepath)+ strlen(mode)+4;
+
     if (sendto(sock, request, request_length, 0, res->ai_addr, res->ai_addrlen) == -1) {
         perror("sendto");
         exit(EXIT_FAILURE);
     }
-    // if (recvfrom(sock, request, strlen(request), 
+    
+    char response[516];
+    int response_length = 516;
+
+    printf("\nFile : \n\r");
+
+    // Loop to receive all blocks
+    while (response_length >= 516){
+
+
+        // Extracting the source address
+        struct sockaddr_storage src_addr;
+        socklen_t src_addr_len = sizeof(src_addr);
+
+        // Receiving the response packet
+        if ((response_length = recvfrom(sock, response, 516, 0, (struct sockaddr *)&src_addr, &src_addr_len)) == -1) {
+            perror("recvfrom");
+            exit(EXIT_FAILURE);
+        }
+
+        for (int i = 0; i < response_length; i++) {
+            printf("%c", response[i]);
+        }
+        
+
+        char ack[4];
+        ack[0] = 0;
+        ack[1] = 4;
+        ack[2] = response[2];
+        ack[3] = response[3];
+
+        if (sendto(sock, ack, 4, 0, (struct sockaddr *)&src_addr, res->ai_addrlen) == -1) {
+            perror("sendto");
+            exit(EXIT_FAILURE);
+        }
+
+    }
+    printf("\n\r");
+    close(sock);
+    exit(EXIT_SUCCESS);
 
 }
