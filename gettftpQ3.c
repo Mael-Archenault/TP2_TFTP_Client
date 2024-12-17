@@ -43,14 +43,5 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
     
-    // // Connecting to the server
-    // if (connect(sock, res->ai_addr, res->ai_addrlen) == -1) {
-    //     perror("connect");
-    //     exit(EXIT_FAILURE);
-    // }
-
-    printf("Connected to server...\n");
-
-
 
 }
