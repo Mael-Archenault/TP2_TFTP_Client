@@ -35,11 +35,11 @@ With this method, we are able to transmit a data packet (max 512 bytes)
 
 We will test it with this file in the server
 
-![alt text](https://github.com/Mael-Archenault/TP2_TFTP_Client/blob/main/img/Q4a_testFile.png)
+![alt text](https://github.com/Mael-Archenault/TP2_TFTP_Client/blob/main/img/Q4_testFile.png)
 
 On wireshark, we get :
 
-![alt text](https://github.com/Mael-Archenault/TP2_TFTP_Client/blob/main/img/Q4a_wireshark.png)
+![alt text](https://github.com/Mael-Archenault/TP2_TFTP_Client/blob/main/img/Q4_wireshark.png)
 
 We can see the data has been successfully transmitted
 
