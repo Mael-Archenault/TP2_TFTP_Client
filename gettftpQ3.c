@@ -42,6 +42,6 @@ int main(int argc, char *argv[]) {
         perror("socket");
         exit(EXIT_FAILURE);
     }
-    
+
 
 }
