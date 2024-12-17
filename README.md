@@ -42,10 +42,13 @@ On wireshark, we get :
 ![alt text](https://github.com/Mael-Archenault/TP2_TFTP_Client/blob/main/img/Q4_wireshark.png)
 
 We can see the data has been successfully transmitted
+![alt text](https://github.com/Mael-Archenault/TP2_TFTP_Client/blob/main/img/Q4_dataResponse.png)
 
 To transmit higher sizes of data, we need to check for the size of the transmitted data.
   - if it is equal to 512 bytes, there is still data to get
   - else it is the last packet
+
+![alt text](https://github.com/Mael-Archenault/TP2_TFTP_Client/blob/main/img/Q4_multiple_wireshark.png)
 
 ## Question 5
 
@@ -56,6 +59,7 @@ WARNING : we did not find how to create a file on the server. Is there a special
 When the writing request is sent, the server respond with an acknowledgment with block number zero. Once the client receives this acknowledgement, we can send the data (opened with a file descriptor) by packets of 512 bytes.
 
 We did not have time to finish this part with several packets, however, the single-frame mode works.
+![alt text](https://github.com/Mael-Archenault/TP2_TFTP_Client/blob/main/img/Q5_wireshark.png)
 
 
 
